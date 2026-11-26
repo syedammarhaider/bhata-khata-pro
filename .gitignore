@@ -1,0 +1,16 @@
+﻿node_modules/
+dist/
+build/
+target/
+src-tauri/target/
+*.log
+.env
+.DS_Store
+Thumbs.db
+nul
+.cargo/
+.devin/
+.vs/
+dom-check.*
+*-check.png
+dist-css.txt
