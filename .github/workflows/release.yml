@@ -21,11 +21,11 @@ jobs:
         shell: pwsh
         run: |
           $packageVersion = node -p "require('./package.json').version"
+          $packageLockVersion = node -p "require('./package-lock.json').packages[''].version"
           $tauriVersion = (Get-Content 'src-tauri/tauri.conf.json' -Raw | ConvertFrom-Json).version
           $cargoVersion = [regex]::Match((Get-Content 'src-tauri/Cargo.toml' -Raw), '(?ms)^\[package\].*?^version\s*=\s*"([^"]+)"').Groups[1].Value
-          $versions = @($packageVersion, $tauriVersion, $cargoVersion) | Select-Object -Unique
-          if ($versions.Count -ne 1) {
-            throw "package.json, tauri.conf.json, and Cargo.toml must use the same version"
+          if (($packageVersion -ne $packageLockVersion) -or ($packageVersion -ne $tauriVersion) -or ($packageVersion -ne $cargoVersion)) {
+            throw "Version mismatch: package.json=$packageVersion; package-lock.json=$packageLockVersion; tauri.conf.json=$tauriVersion; Cargo.toml=$cargoVersion"
           }
           if ($env:GITHUB_REF_NAME -ne "v$packageVersion") {
             throw "Tag $env:GITHUB_REF_NAME must match app version v$packageVersion"
