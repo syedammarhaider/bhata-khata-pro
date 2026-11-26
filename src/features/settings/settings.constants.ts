@@ -102,6 +102,11 @@ export const SETTINGS_NAVIGATION: SettingsNavigationItem[] = [
     label: "General",
     description: "General application preferences",
   },
+  {
+    id: "support",
+    label: "Support & updates",
+    description: "View error logs, export a report and check for app updates",
+  },
 ];
 
 export const DEFAULT_THEME: AppTheme = "light";

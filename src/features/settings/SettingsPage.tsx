@@ -32,6 +32,7 @@ import ExpenseCategoriesSettings from "./components/ExpenseCategoriesSettings";
 import DriversSettings from "./components/DriversSettings";
 import FuelTypesSettings from "./components/FuelTypesSettings";
 import LabourPolicySettings from "./components/LabourPolicySettings";
+import SupportUpdatesSettings from "./components/SupportUpdatesSettings";
 
 import type {
   GeneralSettings as GeneralSettingsType,
@@ -222,6 +223,17 @@ export default function SettingsPage() {
               onChange={setGeneralSettings}
               onSave={handleSave}
             />
+          </SettingsSection>
+        );
+
+      case "support":
+        return (
+          <SettingsSection
+            title="Support & software updates"
+            description="Review recent app errors, export a diagnostic report for support, or check for a signed update."
+            icon={<Settings size={19} />}
+          >
+            <SupportUpdatesSettings />
           </SettingsSection>
         );
 

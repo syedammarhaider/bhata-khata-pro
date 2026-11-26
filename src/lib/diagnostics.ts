@@ -31,7 +31,7 @@ export async function buildDiagnosticPayload(extra?: string) {
       `Schema version: ${info.schema_version}`,
       `DB size: ${info.db_size_bytes} bytes`,
       extra ? `\nUser note:\n${extra}` : "",
-      "\n--- RECENT LOG (sanitized) ---",
+      "\n--- RECENT LOG (may contain user data; review before sharing) ---",
       truncate(errors.join("\n"), 6000),
     ].join("\n");
   } catch {

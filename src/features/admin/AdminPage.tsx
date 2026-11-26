@@ -20,7 +20,7 @@ const MAX_DAYS = 365;
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("adminbrick");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -72,18 +72,15 @@ export default function AdminPage() {
     setLoginError("");
     setIsLoading(true);
     try {
-      const result = await loginUser(username, password).catch(() => null);
-      if (result?.session?.user_id || password.trim() === "adminbrick") {
+      const result = await loginUser(username, password);
+      if (result.user.role === "admin" && result.session.user_id) {
         setIsLoggedIn(true);
-        if (result?.session) {
-          localStorage.setItem("admin_session", JSON.stringify(result.session));
-        }
         await loadAdminData();
       } else {
-        setLoginError("Login failed. Use password: adminbrick");
+        setLoginError("An administrator account is required.");
       }
     } catch (err) {
-      setLoginError(err instanceof Error ? err.message : "Login failed");
+      setLoginError(err instanceof Error ? err.message : "Invalid username or password.");
     } finally {
       setIsLoading(false);
     }
@@ -112,14 +109,6 @@ export default function AdminPage() {
       setOverviewLoading(false);
     }
   }
-
-  useEffect(() => {
-    const session = localStorage.getItem("admin_session");
-    if (session) {
-      setIsLoggedIn(true);
-      loadAdminData();
-    }
-  }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -158,7 +147,6 @@ export default function AdminPage() {
   }
 
   function handleLogout() {
-    localStorage.removeItem("admin_session");
     setIsLoggedIn(false);
     setSalesData([]);
     setAuditLogs([]);
@@ -295,9 +283,6 @@ export default function AdminPage() {
               {isLoading ? "Logging in..." : "Login"}
             </button>
 
-            <p className="text-center text-xs text-slate-400">
-              Any username works — password: adminbrick
-            </p>
           </form>
         </div>
       </div>

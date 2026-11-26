@@ -43,8 +43,8 @@ export default class ErrorBoundary extends Component<Props, State> {
             Something went wrong
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            The app hit an unexpected error. Your data is safe — this has been
-            logged locally.
+            The app hit an unexpected error. It has been logged locally and was
+            not sent automatically.
           </p>
           <p className="mt-2 break-all rounded-lg bg-slate-100 p-2 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             {this.state.message}

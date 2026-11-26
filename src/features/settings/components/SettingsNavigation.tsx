@@ -13,6 +13,7 @@ import {
   Truck,
   Flame,
   Users,
+  LifeBuoy,
 } from "lucide-react";
 
 import { SETTINGS_NAVIGATION } from "../settings.constants";
@@ -33,6 +34,7 @@ const icons: Record<string, any> = {
   appearance: Palette,
   language: Languages,
   general: SlidersHorizontal,
+  support: LifeBuoy,
 };
 
 export default function SettingsNavigation({

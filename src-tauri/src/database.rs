@@ -4931,14 +4931,13 @@ pub fn export_diagnostic_file(db_path: &Path) -> Result<String, String> {
          Generated: {}\n\
          App version: {}\n\
          OS: {} ({})\n\
-         Database: {} ({} bytes, WAL {} bytes)\n\
+         Database size: {} bytes (WAL {} bytes)\n\
          Schema version: {}\n\n\
-         --- RECENT LOG (sanitized) ---\n{}\n",
+         --- RECENT LOG (may contain user data; review before sharing) ---\n{}\n",
         info.generated_at,
         info.app_version,
         info.os,
         info.arch,
-        info.db_path,
         info.db_size_bytes,
         info.wal_size_bytes,
         info.schema_version,
