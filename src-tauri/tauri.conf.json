@@ -23,7 +23,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM3MTEzNDM2M0MzOTYxMTcKUldRWFlUazhOalFSeDFWRmFzVGIwd2pOOTMreHJPOGgvandYNU9MY3o4N0hCdDU0UzVKSEtTNWMK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5NkJwVGd0eTl3TGNGeEFqbWhwSml2TS96dXY4amZ2YnllZUpCYk9aQjQ1d0FBQkFBQUFBQUFBQUFBQUlBQUFBQVdFeUlpUks2U3pIeUlZeDAyVFVhbUM3SmhMamFZMnBmbk4yd1FPWFg0bFZuRUlYNTJyTkxwcUgvMllYbGZzUHEyVTFGNktlUXVIYXBCN01qaW5BK1htYVVWU1g1Mm5IYkZYR1dXSEMzYm1raUtsZzY0ZUpZSHkzZG0rTWMxWGE1K25yN0VsVSswUFU9Cg==",
       "endpoints": [
         "https://github.com/syedammarhaider/bhata-khata-pro/releases/latest/download/latest.json"
       ],
