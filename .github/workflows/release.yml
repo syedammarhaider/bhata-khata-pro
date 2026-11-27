@@ -32,6 +32,18 @@ jobs:
           }
       - name: Install frontend dependencies
         run: npm ci
+      - name: Verify updater signing secrets
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY)) {
+            throw "Missing GitHub Actions secret TAURI_SIGNING_PRIVATE_KEY"
+          }
+          if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD)) {
+            throw "Missing GitHub Actions secret TAURI_SIGNING_PRIVATE_KEY_PASSWORD for the password-protected updater key"
+          }
       - name: Build and publish signed Tauri update
         uses: tauri-apps/tauri-action@v1
         env:

@@ -1,17 +1,17 @@
-# Tauri + React + Typescript
+# Bhatta Khata Pro
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+Offline-first desktop ERP for brick kilns, built with React, TypeScript, Rust, and Tauri 2.
 
-## Recommended IDE Setup
+## Development
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- `npm install` — install frontend dependencies
+- `npm run dev` — start the frontend
+- `npm run build` — create a production frontend build
+- `cargo check` from `src-tauri` — check the Rust backend
+- `npm run tauri dev` — run the desktop app
 
+## Signed Windows releases
 
-Private: (Keep it secret!)
-dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5Vkg1TGlxQXVKRnE4U0wyUVdrNGZOSGN6NEg3S1dPWkJyazFMU21vc3I3QUFBQkFBQUFBQUFBQUFBQUlBQUFBQTRJZ1dZU1J6UkpPcVA1cTliNU5STlJqY3FmZmNTYUZ3d1FKdVo1T0RUellZVUpvUGJSeGhvL1ZLNVZOa0MxOWx6RlZuWjdWVWo5eEhnWkYwblBJMXk3d256Y0QxM25BZ2hmODlLSVNSRG85SXE2SDJrVHE1eUxJeHVrUDNqUVY2c3lPMG1YN0tnVnc9Cg==
+Push a version-matched `v*` tag to run `.github/workflows/release.yml`. The workflow reads the updater signing key from the GitHub Actions secrets `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
 
-
-
-
-Public:
-dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM3MTEzNDM2M0MzOTYxMTcKUldRWFlUazhOalFSeDFWRmFzVGIwd2pOOTMreHJPOGgvandYNU9MY3o4N0hCdDU0UzVKSEtTNWMK
+Never commit or paste a private signing key into this repository. Keep the key in a secure owner-controlled backup and GitHub Actions secrets. See [updates and support](docs/UPDATES-AND-SUPPORT.md) for release steps.
