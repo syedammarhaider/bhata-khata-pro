@@ -1,6 +1,8 @@
 
 import type { ElementType, ReactNode } from "react";
 import { Inbox } from "lucide-react";
+import { useAppStore } from "../../app/store";
+import { translateTextNode } from "../../lib/i18n";
 
 interface EmptyStateProps {
   title?: string;
@@ -17,6 +19,7 @@ export default function EmptyState({
   action,
   className = "",
 }: EmptyStateProps) {
+  const language = useAppStore((state) => state.language);
   return (
     <div
       className={`flex min-h-[260px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center dark:border-slate-700 dark:bg-slate-900 ${className}`}
@@ -27,11 +30,11 @@ export default function EmptyState({
       </div>
 
       <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-        {title}
+        {translateTextNode(title, language)}
       </h3>
 
       <p className="mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
-        {description}
+        {translateTextNode(description, language)}
       </p>
 
       {action && <div className="mt-5">{action}</div>}

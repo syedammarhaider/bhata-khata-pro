@@ -593,6 +593,16 @@ fn change_admin_password(
 }
 
 #[tauri::command]
+fn change_user_password(
+    user_id: i64,
+    old_password: String,
+    new_password: String,
+    state: tauri::State<'_, database::DatabaseState>,
+) -> Result<(), String> {
+    database::change_user_password(&state.path, user_id, &old_password, &new_password)
+}
+
+#[tauri::command]
 fn get_admin_sales_summary(
     days: i64,
     state: tauri::State<'_, database::DatabaseState>,
@@ -785,6 +795,7 @@ pub fn run() {
             get_dashboard_data,
             ensure_admin_user,
             change_admin_password,
+            change_user_password,
             get_admin_sales_summary,
             seed_test_data,
             create_backup,

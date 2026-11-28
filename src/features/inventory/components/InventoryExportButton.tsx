@@ -4,15 +4,18 @@
 // ============================================================
 
 import type { InventoryItem } from "../inventory.types";
+import { useAppStore } from "../../../app/store";
+import { translateText } from "../../../lib/i18n";
 
 export default function InventoryExportButton({
   items,
 }: {
   items: InventoryItem[];
 }) {
+  const language = useAppStore((state) => state.language);
   function exportCsv() {
     const rows = [
-      ["Grade", "Quantity", "Reserved", "Damaged", "Reorder Level"],
+      ["Grade", "Quantity", "Reserved", "Damaged", "Reorder Level"].map((text) => translateText(text, language)),
       ...items.map((item) => [
         item.gradeName,
         String(item.quantity),
@@ -43,7 +46,7 @@ export default function InventoryExportButton({
       onClick={exportCsv}
       className="rounded-lg border px-3 py-2 text-sm dark:border-slate-700"
     >
-      Export CSV
+      {translateText("Export CSV", language)}
     </button>
   );
 }

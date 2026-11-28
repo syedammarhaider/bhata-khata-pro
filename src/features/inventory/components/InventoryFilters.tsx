@@ -5,6 +5,8 @@
 
 import SearchInput from "../../../components/common/SearchInput";
 import type { StockStatus } from "../inventory.types";
+import { useAppStore } from "../../../app/store";
+import { translateText } from "../../../lib/i18n";
 
 interface Props {
   search: string;
@@ -19,13 +21,14 @@ export default function InventoryFilters({
   onSearchChange,
   onStatusChange,
 }: Props) {
+  const language = useAppStore((state) => state.language);
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row">
       <div className="flex-1">
         <SearchInput
           value={search}
           onChange={onSearchChange}
-          placeholder="Search brick grade..."
+          placeholder={translateText("Search brick grade...", language)}
         />
       </div>
 
@@ -36,10 +39,10 @@ export default function InventoryFilters({
         }
         className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
       >
-        <option value="all">All stock statuses</option>
-        <option value="in-stock">In Stock</option>
-        <option value="low-stock">Low Stock</option>
-        <option value="out-of-stock">Out of Stock</option>
+        <option value="all">{translateText("All stock statuses", language)}</option>
+        <option value="in-stock">{translateText("In Stock", language)}</option>
+        <option value="low-stock">{translateText("Low Stock", language)}</option>
+        <option value="out-of-stock">{translateText("Out of Stock", language)}</option>
       </select>
     </div>
   );

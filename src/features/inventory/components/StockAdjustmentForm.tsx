@@ -5,6 +5,7 @@
 
 import { useState, type FormEvent } from "react";
 import type { StockAdjustment } from "../inventory.types";
+import { LocalizedText } from "../../../lib/i18n";
 
 interface Props {
   itemId: string;
@@ -33,7 +34,7 @@ export default function StockAdjustmentForm({ itemId, onSubmit }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <label className="block text-sm font-medium">
-        Adjustment Quantity
+        <LocalizedText text="Adjustment Quantity" />
         <input
           type="number"
           min="1"
@@ -45,7 +46,7 @@ export default function StockAdjustmentForm({ itemId, onSubmit }: Props) {
       </label>
 
       <label className="block text-sm font-medium">
-        Reason
+        <LocalizedText text="Reason" />
         <input
           value={reason}
           onChange={(event) => setReason(event.target.value)}
@@ -55,7 +56,7 @@ export default function StockAdjustmentForm({ itemId, onSubmit }: Props) {
       </label>
 
       <label className="block text-sm font-medium">
-        Notes
+        <LocalizedText text="Notes" />
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
@@ -64,7 +65,7 @@ export default function StockAdjustmentForm({ itemId, onSubmit }: Props) {
       </label>
 
       <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white">
-        Submit Adjustment
+        <LocalizedText text="Submit Adjustment" />
       </button>
     </form>
   );

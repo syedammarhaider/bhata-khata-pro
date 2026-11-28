@@ -350,6 +350,8 @@ export const getDashboardData = () => invoke<DashboardData>("get_dashboard_data"
 export const ensureAdminUser = () => invoke<void>("ensure_admin_user");
 export const changeAdminPassword = (oldPassword: string, newPassword: string) =>
   invoke<void>("change_admin_password", { oldPassword, newPassword });
+export const changeUserPassword = (userId: number, oldPassword: string, newPassword: string) =>
+  invoke<void>("change_user_password", { userId, oldPassword, newPassword });
 export const getAdminSalesSummary = (days: number) =>
   invoke<any[]>("get_admin_sales_summary", { days });
 

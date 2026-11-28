@@ -5,6 +5,7 @@
 
 import type { StockMovementType } from "../inventory.types";
 import { MOVEMENT_LABELS } from "../inventory.constants";
+import { LocalizedText } from "../../../lib/i18n";
 
 const colors: Record<StockMovementType, string> = {
   in: "bg-emerald-100 text-emerald-700",
@@ -21,7 +22,7 @@ export default function InventoryMovementBadge({
 }) {
   return (
     <span className={`rounded-full px-2 py-1 text-xs font-medium ${colors[type]}`}>
-      {MOVEMENT_LABELS[type]}
+      <LocalizedText text={MOVEMENT_LABELS[type]} />
     </span>
   );
 }

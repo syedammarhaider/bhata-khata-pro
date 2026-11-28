@@ -17,7 +17,7 @@ export interface BusinessProfile {
 
 export type AppTheme = "light" | "dark" | "system";
 
-export type AppLanguage = "en" | "ur";
+export type AppLanguage = "en" | "ur" | "both";
 
 export interface PrinterSettings {
   printer_name: string;

@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
+import { useAppStore } from "../../../app/store";
+import { translateTextNode } from "../../../lib/i18n";
 
 type TrendDirection = "up" | "down" | "neutral";
 
@@ -34,12 +36,13 @@ export default function KpiCard({
   accent = "indigo",
   onClick,
 }: KpiCardProps) {
+  const language = useAppStore((state) => state.language);
   const content = (
     <>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            {title}
+            {translateTextNode(title, language)}
           </p>
 
           <p className="mt-2 break-words text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
@@ -55,7 +58,7 @@ export default function KpiCard({
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         {description && (
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            {description}
+            {translateTextNode(description, language)}
           </p>
         )}
 

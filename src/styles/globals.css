@@ -1,6 +1,16 @@
 
 @import "tailwindcss";
 
+@theme {
+  --color-kiln-ink: #182923;
+  --color-kiln-ink-soft: #263b32;
+  --color-kiln-clay: #bd5c3a;
+  --color-kiln-clay-dark: #99452b;
+  --color-kiln-clay-pale: #fdf0e9;
+  --color-kiln-sand: #f7f3ec;
+  --color-kiln-lime: #c9e78b;
+}
+
 @font-face {
   font-family: 'Jameel Noori Nastaleeq';
   src: local('Jameel Noori Nastaleeq'),
@@ -12,9 +22,11 @@
   font-display: swap;
 }
 
-.font-urdu, [lang="ur"], [dir="rtl"], .urdu-text {
+.font-urdu, [lang="ur"], .urdu-text {
   font-family: 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'Noto Nastaliq Urdu', 'Nafees Web Naskh', 'Pak Nastaleeq', Tahoma, Arial, sans-serif !important;
-  line-height: 1.85;
+  font-weight: 700 !important;
+  font-size: 1.16em;
+  line-height: 2.05;
 }
 
 html[lang="ur"] body,
@@ -23,9 +35,33 @@ html[dir="rtl"] body {
   line-height: 1.85;
 }
 
+html.font-urdu {
+  font-size: 100%;
+  line-height: normal;
+}
+
+html.font-urdu body,
+html.font-urdu button,
+html.font-urdu input,
+html.font-urdu select,
+html.font-urdu textarea {
+  font-weight: 700;
+  font-size: 1.08rem;
+  line-height: 1.5;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  --kiln-clay: #bd5c3a;
+  --kiln-clay-dark: #99452b;
+  --kiln-green: #16845f;
+  --kiln-ink: #182923;
+  --kiln-border: #59636e;
+  --kiln-space-1: 0.25rem;
+  --kiln-space-2: 0.5rem;
+  --kiln-space-3: 0.75rem;
+  --kiln-space-4: 1rem;
   font-family: Inter, "Segoe UI", Arial, sans-serif;
   color: #172033;
   background: #f5f7fb;
@@ -40,8 +76,8 @@ html[dir="rtl"] body {
   --border: #e5eaf1;
   --text-primary: #172033;
   --text-secondary: #64748b;
-  --brand: #2563eb;
-  --brand-dark: #1d4ed8;
+  --brand: #bd5c3a;
+  --brand-dark: #99452b;
   --sidebar-bg: #111827;
   --sidebar-text: #cbd5e1;
   --sidebar-active: #2563eb;
@@ -49,6 +85,8 @@ html[dir="rtl"] body {
   --warning: #d97706;
   --danger: #dc2626;
 }
+
+html.language-both body { white-space: pre-line; }
 
 * {
   box-sizing: border-box;
@@ -249,7 +287,7 @@ a {
 .app-surface {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 .app-muted {
@@ -265,8 +303,110 @@ a {
 .app-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 3%);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 4%);
+}
+
+.app-page-title {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.app-page-description {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.app-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border: 1px solid rgb(189 92 58 / 14%);
+  border-radius: 13px;
+  background: var(--color-kiln-clay-pale);
+  color: var(--color-kiln-clay-dark);
+}
+
+.dark .app-icon-chip {
+  border-color: rgb(201 231 139 / 16%);
+  background: rgb(201 231 139 / 9%);
+  color: var(--color-kiln-lime);
+}
+
+.app-card-header {
+  border-color: var(--border);
+  background: linear-gradient(100deg, var(--surface), var(--surface-muted));
+}
+
+.app-control {
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.app-control:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 16%, transparent);
+  outline: none;
+}
+
+.app-button-primary {
+  border-radius: 11px;
+  background: var(--brand);
+  color: #fff;
+  font-weight: 650;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.app-button-primary:hover:not(:disabled) {
+  background: var(--brand-dark);
+  transform: translateY(-1px);
+}
+
+.production-chart-column {
+  animation: chart-column-enter 420ms both;
+}
+
+.production-chart-bar {
+  transform: scaleY(0.01);
+  transform-origin: bottom;
+  animation: chart-bar-rise 880ms cubic-bezier(0.19, 1, 0.22, 1) both;
+  transition: filter 180ms ease, box-shadow 180ms ease;
+  will-change: transform;
+}
+
+.production-chart-column:hover .production-chart-bar,
+.production-chart-column:focus-visible .production-chart-bar {
+  filter: saturate(1.18) brightness(1.08);
+}
+
+@keyframes chart-bar-rise {
+  0% { opacity: 0.35; transform: scaleY(0.01); }
+  76% { opacity: 1; transform: scaleY(1.035); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+@keyframes chart-column-enter {
+  from { opacity: 0; translate: 0 8px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .production-chart-column,
+  .production-chart-bar {
+    animation: none;
+    transform: none;
+    translate: none;
+    transition: none;
+    will-change: auto;
+  }
 }
 
 .form-control {

@@ -1,8 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
+import { useAppStore } from "../../app/store";
+import { translateTextNode } from "../../lib/i18n";
 import {
   Factory,
   RefreshCw,
   Database,
+  Activity,
+  Banknote,
+  CircleDollarSign,
+  ReceiptText,
 } from "lucide-react";
 
 import PageHeader from "../../components/common/PageHeader";
@@ -56,6 +62,7 @@ export default function DashboardPage({
   businessName = "Your Brick Kiln",
   currency = "PKR",
 }: DashboardPageProps) {
+  const language = useAppStore((state) => state.language);
   const [period, setPeriod] = useState<DashboardPeriod>("month");
 
   const [dateRange, setDateRange] = useState<DashboardDateRange>(() =>
@@ -63,12 +70,13 @@ export default function DashboardPage({
   );
 
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [live] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
+  const fetchData = useCallback(async (quiet = false) => {
+    if (!quiet) setIsLoading(true);
     setError(null);
     try {
       const [
@@ -84,8 +92,10 @@ export default function DashboardPage({
         fuelRecords,
       ] = await Promise.all([
         getDashboardData().catch(() => null),
-        getProductionBatches().catch(() => []),
-        getGatePasses().catch(() => []),
+        // These are the chart's source-of-truth tables. Surface database errors
+        // instead of silently rendering an empty or incomplete trend.
+        getProductionBatches(),
+        getGatePasses(),
         getSales().catch(() => []),
         getExpenses().catch(() => []),
         getInventory().catch(() => []),
@@ -165,16 +175,18 @@ export default function DashboardPage({
 
       // ─── 2. Production & Dispatches in Period ──────────────────
       const batchesInPeriod = batchRecords.filter((b: any) =>
-        inRange(b.completed_date || b.start_date),
+        b.status === "completed" && inRange(b.completed_date || b.start_date),
       );
       const periodProduced = batchesInPeriod.reduce(
         (sum: number, b: any) =>
-          sum + (b.produced_quantity || (b.status === "completed" ? b.planned_quantity : 0) || 0),
+          sum + (b.produced_quantity ?? 0),
         0,
       );
 
       // Dispatches: actual bricks dispatched from Gate Passes in period
-      const validPasses = passRecords.filter((p: any) => p.status !== "cancelled");
+      const validPasses = passRecords.filter(
+        (p: any) => p.status === "dispatched" || p.status === "delivered",
+      );
       const passesInPeriod = validPasses.filter((p: any) => inRange(p.dispatch_date));
       const periodDispatched = passesInPeriod.reduce(
         (sum: number, p: any) => sum + (p.quantity ?? 0),
@@ -262,7 +274,7 @@ export default function DashboardPage({
 
       setDashboardData({
         production: {
-          totalProduced: periodProduced || (apiData?.total_production ?? 0),
+          totalProduced: periodProduced,
           totalDispatched: periodDispatched,
           availableStock: totalAvailableStock || (apiData?.total_inventory ?? 0),
           damagedBricks: totalDamagedStock,
@@ -295,13 +307,19 @@ export default function DashboardPage({
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load dashboard data");
     } finally {
-      setIsLoading(false);
+      if (!quiet) setIsLoading(false);
     }
   }, [dateRange, period]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    if (!live) return;
+    const timer = window.setInterval(() => { void fetchData(true); }, 5000);
+    return () => window.clearInterval(timer);
+  }, [fetchData, live]);
 
   function handlePeriodChange(nextPeriod: DashboardPeriod) {
     setPeriod(nextPeriod);
@@ -314,6 +332,37 @@ export default function DashboardPage({
     setPeriod("month");
     setDateRange(getCurrentDateRange("month"));
   }
+
+  const todayMetrics = dashboardData ? [
+    {
+      label: "Sales booked",
+      value: formatDashboardCurrency(dashboardData.todayFinancial.totalSales, currency),
+      hint: "Invoices recorded today",
+      icon: Banknote,
+      tone: "clay",
+    },
+    {
+      label: "Cash received",
+      value: formatDashboardCurrency(dashboardData.todayFinancial.totalReceipts, currency),
+      hint: "Payments collected today",
+      icon: Activity,
+      tone: "green",
+    },
+    {
+      label: "Operating spend",
+      value: formatDashboardCurrency(dashboardData.todayFinancial.totalExpenses, currency),
+      hint: "Expenses recorded today",
+      icon: ReceiptText,
+      tone: "rose",
+    },
+    {
+      label: "Customer dues",
+      value: formatDashboardCurrency(dashboardData.todayFinancial.outstandingBalance, currency),
+      hint: "Still outstanding today",
+      icon: CircleDollarSign,
+      tone: "amber",
+    },
+  ] : [];
 
   async function handleRefresh() {
     setIsRefreshing(true);
@@ -354,10 +403,10 @@ export default function DashboardPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="dashboard-page space-y-6">
       <PageHeader
         title="Dashboard"
-        description="Comprehensive real-time overview of your brick kiln operations, finances, stock, and labour."
+        description="A clear operating picture across production, sales, stock and your team."
         icon={Factory}
         actions={
           <button
@@ -370,7 +419,7 @@ export default function DashboardPage({
               size={16}
               className={isRefreshing ? "animate-spin text-indigo-600" : "text-slate-500"}
             />
-            Refresh Data
+            {translateTextNode("Refresh Data", language)}
           </button>
         }
       />
@@ -389,47 +438,42 @@ export default function DashboardPage({
       {dashboardData && (
         <>
           {/* 🌟 1-DAY (TODAY) SNAPSHOT BAR: Always shows first for 1 Day! */}
-          <section className="overflow-hidden rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 via-white to-blue-50 p-4 shadow-sm dark:border-indigo-900 dark:bg-slate-900 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/40">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-950 dark:text-indigo-200">
-                  Today at a Glance &bull; 1-Day Operations Snapshot
-                </h3>
+          <section className="dashboard-snapshot overflow-hidden rounded-[22px] border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-5">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
+              <div>
+                <div className="mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-kiln-clay">
+                  <span className="h-1.5 w-1.5 rounded-full bg-kiln-clay" /> {translateTextNode("Daily pulse", language)}
+                </div>
+                <h3 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">{translateTextNode("Today at a glance", language)}</h3>
               </div>
-              <span className="rounded-lg bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-200">
+              <span className="rounded-full bg-kiln-sand px-3 py-1.5 text-xs font-semibold text-kiln-ink dark:bg-slate-800 dark:text-slate-200">
                 {toLocalDateString(new Date())}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <div className="rounded-xl border border-indigo-100 bg-white/80 p-3 shadow-xs dark:border-slate-800 dark:bg-slate-800/80">
-                <span className="block text-xs font-medium text-slate-500">Today Sales</span>
-                <span className="text-base font-bold text-slate-900 dark:text-white">
-                  {formatDashboardCurrency(dashboardData.todayFinancial.totalSales, currency)}
-                </span>
-              </div>
-
-              <div className="rounded-xl border border-emerald-100 bg-white/80 p-3 shadow-xs dark:border-slate-800 dark:bg-slate-800/80">
-                <span className="block text-xs font-medium text-slate-500">Today Received</span>
-                <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">
-                  {formatDashboardCurrency(dashboardData.todayFinancial.totalReceipts, currency)}
-                </span>
-              </div>
-
-              <div className="rounded-xl border border-rose-100 bg-white/80 p-3 shadow-xs dark:border-slate-800 dark:bg-slate-800/80">
-                <span className="block text-xs font-medium text-slate-500">Today Expenses</span>
-                <span className="text-base font-bold text-rose-600 dark:text-rose-400">
-                  {formatDashboardCurrency(dashboardData.todayFinancial.totalExpenses, currency)}
-                </span>
-              </div>
-
-              <div className="rounded-xl border border-amber-100 bg-white/80 p-3 shadow-xs dark:border-slate-800 dark:bg-slate-800/80">
-                <span className="block text-xs font-medium text-slate-500">Today Pending</span>
-                <span className="text-base font-bold text-amber-600 dark:text-amber-400">
-                  {formatDashboardCurrency(dashboardData.todayFinancial.outstandingBalance, currency)}
-                </span>
-              </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {todayMetrics.map((metric) => {
+                const Icon = metric.icon;
+                const tone = metric.tone === "clay"
+                  ? "text-kiln-clay bg-kiln-clay-pale"
+                  : metric.tone === "green"
+                    ? "text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/40"
+                    : metric.tone === "rose"
+                      ? "text-rose-700 bg-rose-50 dark:text-rose-300 dark:bg-rose-950/40"
+                      : "text-amber-700 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/40";
+                return (
+                  <article key={metric.label} className="dashboard-pulse-card rounded-2xl border border-slate-100 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/50">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{translateTextNode(metric.label, language)}</p>
+                        <p className="mt-2 break-words text-xl font-semibold tracking-tight text-slate-900 dark:text-white">{metric.value}</p>
+                      </div>
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}><Icon size={18} /></span>
+                    </div>
+                    <p className="mt-3 text-[11px] text-slate-500 dark:text-slate-500">{translateTextNode(metric.hint, language)}</p>
+                  </article>
+                );
+              })}
             </div>
           </section>
 

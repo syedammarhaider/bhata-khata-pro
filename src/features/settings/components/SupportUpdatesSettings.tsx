@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { isTauri } from "@tauri-apps/api/core";
-import { check } from "@tauri-apps/plugin-updater";
+import { check, type Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { Download, Mail, RefreshCw, RotateCw } from "lucide-react";
-import { exportDiagnosticFile, getRecentErrors, getSystemInfo } from "../../../lib/api";
+import { createBackup, exportDiagnosticFile, getRecentErrors, getSystemInfo } from "../../../lib/api";
 import { reportIssueViaEmail } from "../../../lib/diagnostics";
 
 export default function SupportUpdatesSettings() {
@@ -11,7 +11,9 @@ export default function SupportUpdatesSettings() {
   const [appVersion, setAppVersion] = useState("");
   const [loadingLogs, setLoadingLogs] = useState(true);
   const [working, setWorking] = useState(false);
-  const [availableUpdate, setAvailableUpdate] = useState<Awaited<ReturnType<typeof check>>>(null);
+  const [availableUpdate, setAvailableUpdate] = useState<Update | null>(null);
+  const [downloadComplete, setDownloadComplete] = useState(false);
+  const [downloadedBytes, setDownloadedBytes] = useState(0);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
 
@@ -31,6 +33,10 @@ export default function SupportUpdatesSettings() {
 
   useEffect(() => { void refreshLogs(); }, [refreshLogs]);
 
+  useEffect(() => () => {
+    if (availableUpdate) void availableUpdate.close().catch(() => {});
+  }, [availableUpdate]);
+
   async function handleExport() {
     setWorking(true);
     setError("");
@@ -48,6 +54,8 @@ export default function SupportUpdatesSettings() {
   async function handleUpdateCheck() {
     setWorking(true);
     setAvailableUpdate(null);
+    setDownloadComplete(false);
+    setDownloadedBytes(0);
     setError("");
     setStatus("");
     try {
@@ -58,7 +66,7 @@ export default function SupportUpdatesSettings() {
         setStatus(appVersion ? `You are using the latest version (${appVersion}).` : "You are using the latest version.");
         return;
       }
-      setStatus(`Version ${update.version} is available. Install it when you are ready.`);
+      setStatus(`Version ${update.version} is available. Download it to continue.`);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : String(reason));
     } finally {
@@ -66,17 +74,42 @@ export default function SupportUpdatesSettings() {
     }
   }
 
-  async function handleUpdateInstall() {
+  async function handleUpdateDownload() {
     if (!availableUpdate) return;
     setWorking(true);
     setError("");
     setStatus(`Downloading version ${availableUpdate.version}…`);
     try {
-      await availableUpdate.downloadAndInstall();
-      setStatus("Update installed. Restarting the app…");
+      await availableUpdate.download((event) => {
+        if (event.event === "Progress") {
+          setDownloadedBytes((value) => value + event.data.chunkLength);
+        }
+      });
+      setDownloadComplete(true);
+      setStatus(`Version ${availableUpdate.version} downloaded. Create a backup and restart to install it.`);
+    } catch (reason) {
+      setDownloadComplete(false);
+      setError(reason instanceof Error ? reason.message : String(reason));
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function handleUpdateInstall() {
+    if (!availableUpdate || !downloadComplete) return;
+    setWorking(true);
+    setError("");
+    setStatus("Creating a safety backup of the local database…");
+    try {
+      const backup = await createBackup();
+      setStatus(`Backup saved at ${backup.path}. Installing version ${availableUpdate.version} and restarting…`);
+      await availableUpdate.install({ restartAfterInstall: true });
+      // Windows normally exits while launching the installer; this also restarts
+      // the app after installation on platforms whose installer returns normally.
       await relaunch();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : String(reason));
+      setStatus("");
     } finally {
       setWorking(false);
     }
@@ -95,9 +128,13 @@ export default function SupportUpdatesSettings() {
           className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
           <RotateCw size={16} className={working ? "animate-spin" : ""} /> Check for updates
         </button>
-        {availableUpdate && <button type="button" onClick={() => void handleUpdateInstall()} disabled={working}
+        {availableUpdate && !downloadComplete && <button type="button" onClick={() => void handleUpdateDownload()} disabled={working}
           className="inline-flex items-center gap-2 rounded-lg border border-indigo-300 px-4 py-2.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 disabled:opacity-60 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-950/50">
-          <Download size={16} /> Install {availableUpdate.version}
+          <Download size={16} /> Download {availableUpdate.version}
+        </button>}
+        {availableUpdate && downloadComplete && <button type="button" onClick={() => void handleUpdateInstall()} disabled={working}
+          className="inline-flex items-center gap-2 rounded-lg border border-indigo-300 px-4 py-2.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 disabled:opacity-60 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-950/50">
+          <RotateCw size={16} className={working ? "animate-spin" : ""} /> Restart and install {availableUpdate.version}
         </button>}
       </div>
 
@@ -128,6 +165,7 @@ export default function SupportUpdatesSettings() {
       </div>
 
       {status && <p role="status" className="break-words rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">{status}</p>}
+      {working && availableUpdate && !downloadComplete && downloadedBytes > 0 && <p className="text-xs text-slate-500">Downloaded {Math.ceil(downloadedBytes / 1024)} KB</p>}
       {error && <p role="alert" className="break-words rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">{error}</p>}
     </div>
   );

@@ -1,0 +1,471 @@
+- PKR
+. Please contact your software provider to receive a renewal key.
+· Outstanding PKR
+&bull;
+&bull; Earned: PKR
+&bull; Planned:
+&middot;
+&ndash;
+% vs previous
++ Add New Kiln Driver
+03XX XXXXXXX
+03XX-XXXXXXX
+3 &ndash; 4 hours. Vehicle free after safe unloading at destination.
+A Grade
+Absent
+Absent (غیر حاضر)
+Absents
+Account security
+Action
+Activate Bhatta Khata Pro
+Activation key
+Active Fuel Consignments
+Add brick item
+Add Driver
+Add Kiln Fuel Purchase
+Add new category (e.g. Food Expense, Personal Fuel)...
+Add new fuel type (e.g. Sawdust, Pellet)...
+Add resource
+Address
+Administrator account
+Advance Paid (PKR)
+Allowed Leaves:
+Allowed Paid Leaves per Month (No Salary Deduction)
+Already Paid:
+Alternate Phone
+Amount (PKR)
+Application language
+Application theme
+Apply
+Approved Leave (چھٹی)
+Approximate Delivery Time:
+Assign Kiln Driver & Vehicle Fleet
+Attendance Days
+Audit History
+Audit Trail - Manager Activity
+Authorized by: __________
+B Grade
+Backup file
+Bags (بوریاں)
+Bank Account
+Bank Transfer
+Batch Notes & Observations
+Bhari loading entry
+BHATTA KHATA PRO
+Bhatta Khata Pro |
+Breadcrumb
+brick
+Business address
+Business address *
+Business currency
+Business information is stored in the local application database.
+Business owner name
+business@example.com
+C Grade
+Cancel expense voucher
+Cancel this dispatch
+Cancel this order
+Cancel this order?
+Cancellation should be recorded in the audit history.
+Cash in Hand
+Cashbook
+Category expenses for food, fuel, maintenance, or tea
+Change image
+Check for updates
+Check In / Out
+Check-Out
+Checks the configured signed release channel.
+Choose how Bhatta Khata Pro appears on your computer.
+Clear
+Close dialog
+Close menu
+Close modal
+Close navigation
+Close navigation overlay
+Close sidebar
+Coal & Kiln Fuel Materials
+Complete brick kiln address
+Complete business position — sales, stock, production, profit
+Completed batches
+Configure common application behaviour.
+Configure default working shift hours and monthly allowed off-days. Used by the automatic wage calculator to compute exact salaries without manual math.
+Configure fuels used for firing and burning bricks (Coal, Natural Gas, Wood, Rice Husk).
+Configure the preferred printer and document paper size.
+Confirm cancellation
+Confirm truck delivery / unloading
+Contact Information
+Convert to sale
+Cost
+Could not export diagnostics.
+Country
+Create the local admin account used to sign in to this kiln.
+Created
+Created:
+Creates a clean snapshot (VACUUM INTO) in the app's backups folder — safe while the app is running.
+Credit
+Credit (PKR)
+Credit / Payable
+Credit Limit
+Credit Limit (PKR)
+Credit:
+Currency
+Customer ID:
+Customer Module Error
+Customer Register
+Customization
+Customization will be implemented in a future phase.
+Damaged / Broken Quantity
+Database Backup
+Date format
+days
+Days (No deduction)
+Days / Month (Default: 4 off-days)
+Days remaining
+DD/MM/YYYY
+Decided Base
+Decrease quantity
+Default
+Define categories like Food Expense, Personal Fuel, Maintenance, etc. Used in the Expenses module and Financial Dashboard.
+Delivered Quantity
+Deliveries
+Delivery Driver Fleet
+Delivery Driver Fleet & Vehicle Management
+Delivery location
+Delivery Notes / Destination
+Description / Purpose
+Destination
+Destination Address / Site
+Destination:
+Disburse & Save Payment
+Discount (PKR)
+Dismiss alert
+Dismiss notification
+Dispatched (On Truck)
+Display zoom
+Downloaded
+Driver
+Driver & Phone
+Driver name
+Driver Name (e.g. Muhammad Tariq)
+Driver name...
+Driver Phone
+Driver:
+Due: PKR
+Duplicate
+e.g. 1st installment, weekly advance, bonus...
+e.g. Al-Noor Brick Kiln
+e.g. kiln_admin
+e.g. Labour kitchen vegetables and ration, manager bike fuel...
+e.g. LEB-1234
+e.g. Near Canal bridge site, delivery vehicle required...
+e.g. Pattoki
+e.g. Plot 45, Gulberg Road, Lahore
+e.g. Quetta Coal Mining Co.
+e.g. Section A
+e.g. WB-5432, 28.5 tons net weight, truck LEA-9922...
+e.g. Weighbridge slip attached, driver instructed...
+Earned Wage
+EasyPaisa / JazzCash
+Edit profile
+Email address
+Email support
+Enable automatic printing
+End date cannot be earlier than start date.
+Enter admin credentials to access the control panel
+Enter complete kiln address
+Enter installed printer name
+Enter owner name
+Enter the activation or renewal key provided by your software administrator.
+Enter your brick kiln's official details.
+Enter your business information to configure your local ERP system.
+example@email.com
+Existing customer
+Exp
+Expected date
+Expected delivery date
+Expense Category (Configurable in Settings)
+Expense Voucher Details
+Expiry date
+Export Diagnostic File
+Export JSON
+Fields marked with * are required.
+Filter by stage
+Filter by status
+Financial Report
+First Class
+Fixed monthly salary
+Food & Mess Expenses
+Free After (Hours)
+Fuel & Maintenance Overheads
+Fuel Classification
+Fuel Type (Editable in Settings)
+Fully Paid
+Gate Pass Details &bull;
+General preferences
+Go to dashboard
+Good bricks
+Half day
+Half Day (نصف دن)
+Hourly wage
+Hours
+Hours / Shift (Default: 8 hours)
+Hours/Day
+Increase quantity
+Instant Actions
+Invoice ID
+KB
+Keep order
+kg / bag
+Kiln Expense Categories
+Kiln Fuel & Energy Types
+Kiln Management ERP
+Kiln section
+Kiln temperature, coal quality, weather conditions...
+Kilograms (کلوگرام)
+Labour group
+Labour Shift & Leave Policy
+Labour Wages & Attendance Settlements
+Last
+Late Arrival (تاخیر)
+Leave
+Leaves &bull;
+License ID
+Loaded quantity
+Loading Bhatta Khata Pro...
+Loading business profile...
+Low Stock Grades:
+Machinery & fuel costs
+Manage drivers, assign vehicles (e.g. LEB-1234), and configure live availability. Free drivers are selectable on Gate Pass & Orders.
+Maximum file size:
+MB
+Minimum 10 characters
+MM/DD/YYYY
+MMBTU (گیس)
+Module
+Monthly Performance (last 6 months)
+My profile
+Net Financial Position (
+Net Output:
+Net pending balance to settle
+Net Position:
+New Kiln Dispatch &bull; Gate Pass
+New Remaining Balance after this payment:
+Nikasi unloading entry
+No audit events yet
+No audit logs found.
+No backups yet. Click "Create Backup Now" to make your first snapshot.
+No brick items added yet.
+No cashbook entries yet
+No dispatch records
+No gate passes or dispatches found.
+No invoices yet
+No items added yet.
+No ledger activity
+No ledger entries found.
+No payments yet
+No production history is available.
+No production stage records available.
+No purchases yet
+No returns yet
+No sales found for this period.
+No suppliers yet
+No transport records yet
+No worker records found for
+Notes / Receipt Remark
+Notes & Weighbridge Slip #
+Number of copies
+Older than:
+On Leave / Off
+Open navigation
+Opening Balance (PKR)
+Operational Report
+Optional batch notes
+Order Details &bull;
+Ordered
+Ordered Brick Items
+Owner name *
+Page sections
+Paid in installments & advances
+Paid So Far
+Paper size
+Partial
+Party
+Paste your activation key here
+Pathai production entry
+Pay Salary
+Pay Salary &bull;
+Payment Mode
+Payroll Month:
+PB-2026-001
+Per thousand bricks
+PKR
+PKR - Pakistani Rupee
+PKR 0
+Planned
+Planned quantity
+Planned:
+Positive means customer owes the business; negative means customer advance.
+Prepared by: __________
+Present
+Present (حاضر)
+Print Attendance Sheet
+Print expense voucher
+Print Expenses Register
+Print Fuel Sheet
+Print official salary voucher
+Print official sales invoice
+Print order sheet
+Print Payroll Register
+Print this batch
+Print weighbridge voucher
+Printing preferences
+Produced (Good)
+Produced / Planned
+Produced Quantity (Good Bricks)
+Product
+production batch record(s)
+Production In Progress
+Production progress
+Production stage
+Products ordered
+Pur
+Purchase
+Purchase / production rate
+Purchase #
+Purchase Date
+Qty
+Rate / Brick (PKR)
+Receipt Reference
+Received / Delivered
+Recent Activity
+Recent application errors
+Recent Sales
+Record coal, wood, or gas deliveries and supplier costs
+Record customer advance booking and delivery target
+Record fuel, coal, labour, or other batch inputs and unit cost.
+Record ID
+record(s)
+recorded vouchers
+Reference (optional)
+Reload App
+Remaining Wages Payable
+Remarks
+Remove driver
+Remove image
+Remove resource
+Repeat password
+Report Issue via Email
+Reset zoom
+Reset zoom (Ctrl 0)
+Resource name
+Resource quantity
+Resource total: PKR
+Resource unit
+Resource unit cost
+Resource usage
+Restart and install
+Restore history will appear here after SQLite audit integration.
+Route
+Rs.
+Running Balance:
+Sales Summary
+Save Bhari entry
+Save Fuel Purchase
+Save Nikasi entry
+Save Pathai entry
+Save Policy
+Save preferences
+Save stage
+Saved Backups
+Search cashbook...
+Search customer name, code, or phone...
+Second Class
+Seconds
+Select a customer or enter a new one below
+Select Managed Driver...
+Select Production Stage (پیداواری مرحلہ)
+Selected preview
+Selling
+Selling price / brick
+Set up your brick kiln
+Set up your brick kiln business.
+Settings & Kiln Configuration
+Settings sections
+Shift Hours
+Shift:
+Size
+Software License
+Software updates
+Something went wrong
+Special Grade
+Staff & labour meals
+Stage
+Standard Daily Working Hours
+Started
+STK-0001
+Stock by Grade
+Subscription Required
+Supplier / Vendor Name
+Support & software updates
+Target Delivery Date
+The app hit an unexpected error. It has been logged locally and was not sent automatically.
+The latest 100 local log entries. Reports include app metadata and recent log text; review them before sharing.
+These are printer preferences only. Actual printer discovery, test printing and print-job handling will be implemented through the desktop printing service.
+This section is ready for audit history data integration.
+This section is ready for backup & restore data integration.
+This section is ready for labour & workers data integration.
+This section is ready for payments & ledger data integration.
+This section is ready for suppliers data integration.
+This section is ready for wages & settlements data integration.
+Time
+Toggle sidebar
+Tons
+Tons (ٹن)
+Top Customers (by recent sales)
+Total batches
+Total Calculated Payroll (
+Total Cost
+Total Cost (PKR)
+Total Fuel Expenditure
+Total Purchase Price
+Total Receivable
+Total Wages Disbursed
+Total Workforce
+Total: Rs.
+Track all changes, deletions, and cancellations made by managers.
+Trip #
+Truck Dispatched (On Way)
+Truck Load (ڈمپر / ٹرک)
+Unable to load gate passes
+Unable to load orders
+Unit
+Unit cost PKR
+Unit price
+Up to
+Update Production Batch &bull;
+Update production stage
+USD - US Dollar
+Used for brick firing in kiln
+Used to calculate hourly rates and partial shift deductions.
+User management will be implemented with SQLite integration.
+Users & Permissions
+Vehicle # (e.g. LEB-1234)
+Vehicle and driver
+Verified & weighed
+Weekly Off (ہفتہ وار چھٹی)
+When a worker takes up to this many off-days, their salary is NOT deducted. Only absences exceeding this quota will incur wage deductions.
+Work category
+Worker ID
+Worker ID: #
+Workforce Attendance & Salary Policy
+You have permission to view this dashboard information.
+Your accounting records remain stored locally on this computer.
+Your Bhatta Khata Pro subscription is
+Your business information is stored locally on this computer.
+Your business name, owner details, phone number, address, currency and language are stored in the local business profile database.
+Your existing business data has not been deleted. Contact your administrator for license renewal and data export assistance.
+YYYY-MM-DD
+Zoom in
+Zoom in (Ctrl +)
+Zoom out
+Zoom out (Ctrl −)

@@ -15,6 +15,8 @@ interface SectionCardProps {
 }
 
 import { useState } from "react";
+import { useAppStore } from "../../app/store";
+import { translateTextNode } from "../../lib/i18n";
 
 export default function SectionCard({
   title,
@@ -28,27 +30,28 @@ export default function SectionCard({
   defaultCollapsed = false,
 }: SectionCardProps) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const language = useAppStore((state) => state.language);
 
   return (
     <section
-      className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 ${className}`}
+      className={`app-card overflow-hidden ${className}`}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-4 py-4 dark:border-slate-800 sm:px-5">
+      <div className="app-card-header flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
           {Icon && (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+            <div className="app-icon-chip h-9 w-9 shrink-0">
               <Icon size={18} />
             </div>
           )}
 
           <div className="min-w-0">
             <h2 className="truncate text-sm font-semibold text-slate-900 dark:text-white">
-              {title}
+              {translateTextNode(title, language)}
             </h2>
 
             {description && (
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                {description}
+                {translateTextNode(description, language)}
               </p>
             )}
           </div>

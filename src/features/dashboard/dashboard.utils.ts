@@ -196,17 +196,16 @@ export function buildProductionTrend(
   };
 
   batches.forEach((batch) => {
-    const produced =
-      (batch.produced_quantity ?? 0) > 0
-        ? batch.produced_quantity!
-        : batch.status === "completed"
-          ? batch.planned_quantity ?? 0
-          : 0;
+    // Keep measured output distinct from the target. A completed batch with
+    // zero recorded production contributes zero; planned quantity is not output.
+    if (batch.status !== "completed") return;
+    const produced = batch.produced_quantity ?? 0;
     addTo(batch.completed_date || batch.start_date, "produced", produced);
   });
 
   gatePasses.forEach((pass) => {
-    if (pass.status === "cancelled") return;
+    // A gate pass is only a dispatch once the vehicle has left the kiln.
+    if (pass.status !== "dispatched" && pass.status !== "delivered") return;
     addTo(pass.dispatch_date, "dispatched", pass.quantity ?? 0);
   });
 

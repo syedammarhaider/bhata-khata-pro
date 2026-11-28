@@ -36,14 +36,24 @@ import ReportsPage from "../features/reports/ReportsPage";
 import AnalyticsPage from "../features/analytics/AnalyticsPage";
 import AdminPage from "../features/admin/AdminPage";
 import AppLayout from "../components/layout/AppLayout";
+import { installLanguageDomTranslation } from "../lib/i18n";
 
-import type { BusinessProfile } from "../types";
+import type { BusinessProfile, LanguageCode } from "../types";
 
 import "../styles/globals.css";
 
 interface AppBootstrapState {
   business_profile: BusinessProfile | null;
   admin_exists: boolean;
+}
+
+interface AppSetting {
+  setting_key: string;
+  setting_value: string;
+}
+
+function isLanguageCode(value: string | undefined): value is LanguageCode {
+  return value === "en" || value === "ur" || value === "both";
 }
 
 function ApplicationRoutes() {
@@ -63,6 +73,9 @@ function ApplicationRoutes() {
     (state) => state.setBusinessProfile,
   );
 
+  const setLanguage = useAppStore((state) => state.setLanguage);
+  const language = useAppStore((state) => state.language);
+
   const setRequiresSetup = useAppStore(
     (state) => state.setRequiresSetup,
   );
@@ -81,6 +94,16 @@ function ApplicationRoutes() {
   }, [setActiveRoute]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    root.dir = language === "ur" ? "rtl" : "ltr";
+    root.lang = language === "ur" ? "ur" : "en";
+    root.classList.toggle("font-urdu", language === "ur");
+    root.classList.toggle("language-both", language === "both");
+  }, [language]);
+
+  useEffect(() => installLanguageDomTranslation(language), [language]);
+
+  useEffect(() => {
     let active = true;
 
     async function bootstrap() {
@@ -93,6 +116,24 @@ function ApplicationRoutes() {
         setRequiresSetup(
           !state.business_profile || !state.admin_exists,
         );
+
+        const profileLanguage = state.business_profile?.language;
+        if (isLanguageCode(profileLanguage)) {
+          setLanguage(profileLanguage);
+        }
+
+        try {
+          const settings = await invoke<AppSetting[]>("get_app_settings");
+          const savedLanguage = settings.find(
+            (setting) => setting.setting_key === "language",
+          )?.setting_value;
+          if (!active) return;
+          if (isLanguageCode(savedLanguage)) {
+            setLanguage(savedLanguage);
+          }
+        } catch (error) {
+          console.error("Unable to load saved language preference:", error);
+        }
       } catch {
         if (active) {
           setRequiresSetup(true);
@@ -112,6 +153,7 @@ function ApplicationRoutes() {
   }, [
     setBusinessProfile,
     setInitialized,
+    setLanguage,
     setRequiresSetup,
   ]);
 

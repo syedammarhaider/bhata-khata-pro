@@ -1,6 +1,7 @@
 // ============================================================
 // FILE 316
 // PATH: src/features/inventory/components/InventoryMovementSummary.tsx
+import { LocalizedText } from "../../../lib/i18n";
 // ============================================================
 
 import type { StockMovement } from "../inventory.types";
@@ -21,11 +22,11 @@ export default function InventoryMovementSummary({
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <div className="rounded-xl bg-emerald-50 p-4 dark:bg-emerald-950/20">
-        <p className="text-sm text-emerald-700">Incoming</p>
+        <p className="text-sm text-emerald-700"><LocalizedText text="Incoming" /></p>
         <p className="mt-1 text-xl font-semibold text-emerald-800">{incoming.toLocaleString()}</p>
       </div>
       <div className="rounded-xl bg-rose-50 p-4 dark:bg-rose-950/20">
-        <p className="text-sm text-rose-700">Outgoing</p>
+        <p className="text-sm text-rose-700"><LocalizedText text="Outgoing" /></p>
         <p className="mt-1 text-xl font-semibold text-rose-800">{outgoing.toLocaleString()}</p>
       </div>
     </div>

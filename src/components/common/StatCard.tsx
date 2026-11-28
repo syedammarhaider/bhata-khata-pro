@@ -5,6 +5,8 @@ import {
   ArrowUpRight,
   Minus,
 } from "lucide-react";
+import { useAppStore } from "../../app/store";
+import { translateTextNode } from "../../lib/i18n";
 
 type TrendDirection = "up" | "down" | "neutral";
 
@@ -31,6 +33,7 @@ export default function StatCard({
   iconBackground = "bg-blue-50 dark:bg-blue-500/10",
   className = "",
 }: StatCardProps) {
+  const language = useAppStore((state) => state.language);
   const TrendIcon =
     trendDirection === "up"
       ? ArrowUpRight
@@ -47,12 +50,12 @@ export default function StatCard({
 
   return (
     <article
-      className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-slate-900 sm:p-5 ${className}`}
+      className={`app-card rounded-2xl p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg sm:p-5 ${className}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
-            {title}
+            {translateTextNode(title, language)}
           </p>
 
           <p className="mt-2 break-words text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
@@ -78,7 +81,7 @@ export default function StatCard({
 
           {description && (
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              {description}
+              {translateTextNode(description, language)}
             </span>
           )}
         </div>

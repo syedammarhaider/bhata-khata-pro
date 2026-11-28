@@ -5,7 +5,7 @@ import {
   loginUser,
   getAdminSalesSummary,
   getAuditLogs,
-  changeAdminPassword,
+  changeUserPassword,
   seedTestData,
   getDashboardData,
   getProductionBatches,
@@ -19,7 +19,8 @@ const MAX_DAYS = 365;
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("admin");
+  const [username, setUsername] = useState("brick");
+  const [adminUserId, setAdminUserId] = useState<number | null>(null);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
@@ -74,6 +75,7 @@ export default function AdminPage() {
     try {
       const result = await loginUser(username, password);
       if (result.user.role === "admin" && result.session.user_id) {
+        setAdminUserId(result.user.id);
         setIsLoggedIn(true);
         await loadAdminData();
       } else {
@@ -134,20 +136,24 @@ export default function AdminPage() {
       setPasswordMessage("Passwords do not match");
       return;
     }
+    if (!adminUserId) {
+      setPasswordMessage("Administrator session is missing. Sign in again.");
+      return;
+    }
     try {
-      await changeAdminPassword(oldPassword, newPassword);
+      await changeUserPassword(adminUserId, oldPassword, newPassword);
       setPasswordMessage("Password changed successfully!");
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setShowPasswordChange(false);
     } catch (err) {
-      setPasswordMessage(err instanceof Error ? err.message : "Failed to change password");
+      setPasswordMessage(typeof err === "string" ? err : err instanceof Error ? err.message : "Failed to change password");
     }
   }
 
   function handleLogout() {
     setIsLoggedIn(false);
+    setAdminUserId(null);
     setSalesData([]);
     setAuditLogs([]);
   }
@@ -243,7 +249,7 @@ export default function AdminPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-                placeholder="admin"
+                placeholder="brick"
               />
             </div>
 
@@ -484,7 +490,7 @@ export default function AdminPage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 required
-                minLength={6}
+                minLength={10}
               />
             </div>
             <div>

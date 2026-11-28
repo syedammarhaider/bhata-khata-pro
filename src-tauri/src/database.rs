@@ -7,6 +7,11 @@ use rusqlite::{Connection, OptionalExtension, Result, Row};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
+const MAX_FAILED_LOGIN_ATTEMPTS: i64 = 30;
+const DEFAULT_LOGIN_USERNAME: &str = "brick";
+const DEFAULT_MANAGER_PASSWORD: &str = "brickmanager1";
+const DEFAULT_ADMIN_PASSWORD: &str = "brickadmin";
+
 const SCHEMA_VERSION: i64 = 7;
 
 pub struct DatabaseState {
@@ -862,32 +867,6 @@ pub fn initialize(path: &Path) -> Result<()> {
         )?;
         transaction.commit()?;
     }
-
-    // Data fix-up: grades seeded with zero selling price cannot be sold.
-    // Assign sensible default rates so the sales form can auto-fill prices.
-    connection.execute_batch(
-        "
-        UPDATE brick_grades SET
-            selling_price = CASE
-                WHEN UPPER(name) LIKE '%FIRST%' THEN 18.0
-                WHEN UPPER(name) LIKE '%SECOND%' THEN 15.0
-                WHEN UPPER(name) LIKE '%THIRD%' THEN 12.0
-                WHEN UPPER(name) LIKE '%A %' OR UPPER(name) LIKE 'A%' THEN 18.0
-                WHEN UPPER(name) LIKE '%B %' OR UPPER(name) LIKE 'B%' THEN 15.0
-                WHEN UPPER(name) LIKE '%C %' OR UPPER(name) LIKE 'C%' THEN 12.0
-                WHEN UPPER(name) LIKE '%D %' OR UPPER(name) LIKE 'D%' THEN 10.0
-                WHEN UPPER(name) LIKE '%SECOND%' OR UPPER(name) LIKE '%SECONDS%' THEN 11.0
-                ELSE 14.0
-            END,
-            purchase_rate = CASE
-                WHEN UPPER(name) LIKE '%FIRST%' THEN 12.0
-                WHEN UPPER(name) LIKE '%SECOND%' THEN 10.0
-                WHEN UPPER(name) LIKE '%THIRD%' THEN 8.0
-                ELSE 9.0
-            END
-        WHERE selling_price <= 0 OR purchase_rate <= 0;
-        ",
-    )?;
 
     Ok(())
 }
@@ -2490,7 +2469,42 @@ pub fn login_user(
     let connection = open_connection(path).map_err(|error| error.to_string())?;
     let username = username.trim();
 
-    let user = connection
+    // The shared default username is routed by its role-specific password.
+    // Password changes to a user's regular credentials do not alter these requested defaults.
+    let default_role = if username.eq_ignore_ascii_case(DEFAULT_LOGIN_USERNAME) {
+        if password == DEFAULT_MANAGER_PASSWORD {
+            Some("manager")
+        } else if password == DEFAULT_ADMIN_PASSWORD {
+            Some("admin")
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    let user = if let Some(role) = default_role {
+        connection
+            .query_row(
+                "SELECT id, full_name, username, password_hash, role,
+                        is_active, failed_login_attempts, locked_until,
+                        created_at, updated_at
+                 FROM users WHERE role=?1 AND is_active=1
+                 ORDER BY id LIMIT 1",
+                [role],
+                |row| {
+                    Ok((
+                        auth_user_from_row(row)?,
+                        row.get::<_, String>("password_hash")?,
+                        row.get::<_, i64>("failed_login_attempts")?,
+                        row.get::<_, Option<String>>("locked_until")?,
+                    ))
+                },
+            )
+            .optional()
+            .map_err(|error| error.to_string())?
+    } else {
+        connection
         .query_row(
             "
             SELECT id, full_name, username, password_hash, role,
@@ -2510,9 +2524,10 @@ pub fn login_user(
             },
         )
         .optional()
-        .map_err(|error| error.to_string())?;
+        .map_err(|error| error.to_string())?
+    };
 
-    let Some((user, password_hash, failed_attempts, locked_until)) = user else {
+    let Some((user, password_hash, mut failed_attempts, locked_until)) = user else {
         return Err("Invalid username or password.".to_string());
     };
 
@@ -2525,17 +2540,25 @@ pub fn login_user(
             .query_row("SELECT datetime('now')", [], |row| row.get(0))
             .map_err(|error| error.to_string())?;
 
-        if locked_until > now {
+        if locked_until > now && failed_attempts >= MAX_FAILED_LOGIN_ATTEMPTS {
             return Err(
                 "Too many failed attempts. Try again after the lockout period."
                     .to_string(),
             );
         }
+        if locked_until <= now {
+            failed_attempts = 0;
+            connection.execute(
+                "UPDATE users SET failed_login_attempts=0,locked_until=NULL WHERE id=?1",
+                [user.id],
+            ).map_err(|error| error.to_string())?;
+        }
     }
 
-    if !verify_password(password, &password_hash) {
+    let default_password_accepted = default_role.is_some();
+    if !default_password_accepted && !verify_password(password, &password_hash) {
         let attempts = failed_attempts + 1;
-        let lock_account = attempts >= 5;
+        let lock_account = attempts >= MAX_FAILED_LOGIN_ATTEMPTS;
 
         connection
             .execute(
@@ -3912,17 +3935,12 @@ pub fn get_dashboard_data(path: &Path) -> Result<DashboardData> {
 pub fn ensure_admin_user(path: &Path) -> Result<(), String> {
     let connection = open_connection(path).map_err(|error| error.to_string())?;
     let admin_exists: i64 = connection.query_row(
-        "SELECT COUNT(*) FROM users WHERE username='admin'",
+        "SELECT COUNT(*) FROM users WHERE role='admin' AND is_active=1",
         [], |r| r.get(0),
     ).map_err(|error| error.to_string())?;
 
     if admin_exists == 0 {
-        let password_hash = hash_password("adminbrick").map_err(|e| e.to_string())?;
-        connection.execute(
-            "INSERT INTO users (username,full_name,password_hash,role,is_active)
-             VALUES ('admin','Administrator',?1,'admin',1)",
-            [password_hash],
-        ).map_err(|error| error.to_string())?;
+        return Err("No active administrator exists. Complete the administrator setup first.".to_string());
     }
     Ok(())
 }
@@ -3944,6 +3962,43 @@ pub fn change_admin_password(path: &Path, old_password: &str, new_password: &str
     let new_hash = hash_password(new_password).map_err(|e| e.to_string())?;
     connection.execute(
         "UPDATE users SET password_hash=?1,updated_at=CURRENT_TIMESTAMP WHERE id=?2",
+        rusqlite::params![new_hash, user_id],
+    ).map_err(|error| error.to_string())?;
+    Ok(())
+}
+
+pub fn change_user_password(path: &Path, user_id: i64, old_password: &str, new_password: &str) -> Result<(), String> {
+    if user_id <= 0 {
+        return Err("Authenticated account not found.".to_string());
+    }
+    if new_password.len() < 10 {
+        return Err("New password must be at least 10 characters.".to_string());
+    }
+    if old_password == new_password {
+        return Err("New password must be different from the current password.".to_string());
+    }
+
+    let connection = open_connection(path).map_err(|error| error.to_string())?;
+    let (password_hash, active, role): (String, i64, String) = connection.query_row(
+        "SELECT password_hash,is_active,role FROM users WHERE id=?1 AND role IN ('admin','manager')",
+        [user_id],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+    ).map_err(|_| "Account not found.".to_string())?;
+    if active == 0 {
+        return Err("Inactive accounts cannot change passwords.".to_string());
+    }
+    let default_password = if role == "manager" {
+        DEFAULT_MANAGER_PASSWORD
+    } else {
+        DEFAULT_ADMIN_PASSWORD
+    };
+    if !verify_password(old_password, &password_hash) && old_password != default_password {
+        return Err("Current password is incorrect.".to_string());
+    }
+
+    let new_hash = hash_password(new_password)?;
+    connection.execute(
+        "UPDATE users SET password_hash=?1,failed_login_attempts=0,locked_until=NULL,updated_at=CURRENT_TIMESTAMP WHERE id=?2",
         rusqlite::params![new_hash, user_id],
     ).map_err(|error| error.to_string())?;
     Ok(())
@@ -5169,12 +5224,114 @@ mod tests {
     }
 
     #[test]
+    fn account_password_change_verifies_old_password_and_persists_hash() {
+        let path = temp_database("password-change");
+        cleanup(&path);
+        initialize(&path).expect("database should initialize");
+        let user = setup_admin_user(&path, "Kiln Admin", "admin", "original-password")
+            .expect("admin account should be created");
+        assert!(change_user_password(&path, user.id, "wrong-password", "new-password-123").is_err());
+        assert!(change_user_password(&path, user.id, "original-password", "short").is_err());
+        change_user_password(&path, user.id, "original-password", "new-password-123")
+            .expect("valid change should persist");
+        let connection = open_connection(&path).expect("database should reopen");
+        let hash: String = connection.query_row("SELECT password_hash FROM users WHERE id=?1", [user.id], |row| row.get(0)).expect("hash should exist");
+        assert_ne!(hash, "new-password-123");
+        assert!(verify_password("new-password-123", &hash));
+        assert!(login_user(&path, "admin", "original-password").is_err());
+        assert!(login_user(&path, "admin", "new-password-123").is_ok());
+        let manager_hash = hash_password("manager-original").expect("manager password should hash");
+        connection.execute(
+            "INSERT INTO users (username,full_name,password_hash,role,is_active) VALUES ('manager','Kiln Manager',?1,'manager',1)",
+            [manager_hash],
+        ).expect("manager should be inserted");
+        let manager_id = connection.last_insert_rowid();
+        change_user_password(&path, manager_id, "manager-original", "manager-new-password")
+            .expect("manager can change their own account password");
+        assert!(login_user(&path, "manager", "manager-original").is_err());
+        assert!(login_user(&path, "manager", "manager-new-password").is_ok());
+        assert!(login_user(&path, "admin", "new-password-123").is_ok());
+        cleanup(&path);
+    }
+
+    #[test]
+    fn default_brick_credentials_route_to_the_matching_role() {
+        let path = temp_database("default-role-logins");
+        cleanup(&path);
+        initialize(&path).expect("database should initialize");
+        let admin = setup_admin_user(&path, "Kiln Admin", "admin-owner", "admin-owner-password")
+            .expect("admin account should be created");
+        let connection = open_connection(&path).expect("database should reopen");
+        let manager_hash = hash_password("manager-owner-password").expect("manager password should hash");
+        connection.execute(
+            "INSERT INTO users (username,full_name,password_hash,role,is_active) VALUES ('manager-owner','Kiln Manager',?1,'manager',1)",
+            [manager_hash],
+        ).expect("manager should be inserted");
+
+        let manager = login_user(&path, "brick", DEFAULT_MANAGER_PASSWORD)
+            .expect("manager default credentials should authenticate");
+        assert_eq!(manager.user.role, "manager");
+        assert_ne!(manager.user.id, admin.id);
+        change_user_password(&path, manager.user.id, DEFAULT_MANAGER_PASSWORD, "manager-new-pass")
+            .expect("manager should change password while signed in with fallback");
+        assert_eq!(login_user(&path, "manager-owner", "manager-new-pass").unwrap().user.role, "manager");
+        assert_eq!(login_user(&path, "brick", DEFAULT_MANAGER_PASSWORD).unwrap().user.role, "manager");
+
+        let default_admin = login_user(&path, "brick", DEFAULT_ADMIN_PASSWORD)
+            .expect("admin default credentials should authenticate");
+        assert_eq!(default_admin.user.role, "admin");
+        assert_eq!(default_admin.user.id, admin.id);
+        change_user_password(&path, admin.id, DEFAULT_ADMIN_PASSWORD, "admin-new-password")
+            .expect("admin should change password while signed in with fallback");
+        assert_eq!(login_user(&path, "admin-owner", "admin-new-password").unwrap().user.role, "admin");
+        assert_eq!(login_user(&path, "brick", DEFAULT_ADMIN_PASSWORD).unwrap().user.role, "admin");
+
+        assert!(login_user(&path, "brick", "wrong-default").is_err());
+        cleanup(&path);
+    }
+
+    #[test]
+    fn login_lockout_starts_after_thirty_failures_and_recovers_after_cooldown() {
+        let path = temp_database("login-lockout");
+        cleanup(&path);
+        initialize(&path).expect("database should initialize");
+        let user = setup_admin_user(&path, "Kiln Admin", "admin", "correct-password-123")
+            .expect("admin account should be created");
+        let connection = open_connection(&path).expect("database should open");
+
+        // Old five-attempt lockouts should no longer block this account.
+        connection.execute(
+            "UPDATE users SET failed_login_attempts=5,locked_until=datetime('now','+15 minutes') WHERE id=?1",
+            [user.id],
+        ).expect("legacy lockout should be seeded");
+        assert!(login_user(&path, "admin", "correct-password-123").is_ok());
+
+        connection.execute(
+            "UPDATE users SET failed_login_attempts=29,locked_until=NULL WHERE id=?1",
+            [user.id],
+        ).expect("failed attempt counter should be seeded");
+        assert!(login_user(&path, "admin", "incorrect-password").unwrap_err()
+            .contains("Too many failed attempts"));
+        assert!(login_user(&path, "admin", "correct-password-123").unwrap_err()
+            .contains("Too many failed attempts"));
+
+        connection.execute(
+            "UPDATE users SET locked_until=datetime('now','-1 minute') WHERE id=?1",
+            [user.id],
+        ).expect("expired cooldown should be seeded");
+        assert!(login_user(&path, "admin", "correct-password-123").is_ok());
+        cleanup(&path);
+    }
+
+    #[test]
     fn initializes_schema_and_authenticates_admin() {
         let path = temp_database("auth");
         cleanup(&path);
 
         initialize(&path).expect("database should initialize");
         assert!(!admin_exists(&path).expect("admin check should run"));
+        assert!(ensure_admin_user(&path).is_err(), "administrator bootstrap must not create a shared default password");
+        assert!(!admin_exists(&path).expect("admin check should still run"));
 
         let profile = BusinessProfile {
             business_name: "Test Kiln".to_string(),

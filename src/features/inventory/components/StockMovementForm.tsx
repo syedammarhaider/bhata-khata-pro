@@ -6,6 +6,8 @@
 import { useState, type FormEvent } from "react";
 import type { StockMovementInput, StockMovementType } from "../inventory.types";
 import { MOVEMENT_OPTIONS } from "../inventory.constants";
+import { useAppStore } from "../../../app/store";
+import { LocalizedText, translateText } from "../../../lib/i18n";
 
 interface Props {
   itemId: string;
@@ -14,6 +16,7 @@ interface Props {
 }
 
 export default function StockMovementForm({ itemId, onSubmit, onCancel }: Props) {
+  const language = useAppStore((state) => state.language);
   const [type, setType] = useState<StockMovementType>("in");
   const [quantity, setQuantity] = useState("1");
   const [reference, setReference] = useState("");
@@ -39,20 +42,20 @@ export default function StockMovementForm({ itemId, onSubmit, onCancel }: Props)
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <label className="block text-sm font-medium">
-        Movement Type
+        <LocalizedText text="Movement Type" />
         <select
           value={type}
           onChange={(event) => setType(event.target.value as StockMovementType)}
           className="mt-1 w-full rounded-lg border p-2 dark:border-slate-700 dark:bg-slate-900"
         >
           {MOVEMENT_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
+            <option key={option.value} value={option.value}>{translateText(option.label, language)}</option>
           ))}
         </select>
       </label>
 
       <label className="block text-sm font-medium">
-        Quantity
+        <LocalizedText text="Quantity" />
         <input
           type="number"
           min="1"
@@ -64,7 +67,7 @@ export default function StockMovementForm({ itemId, onSubmit, onCancel }: Props)
       </label>
 
       <label className="block text-sm font-medium">
-        Reference
+        <LocalizedText text="Reference" />
         <input
           value={reference}
           onChange={(event) => setReference(event.target.value)}
@@ -74,7 +77,7 @@ export default function StockMovementForm({ itemId, onSubmit, onCancel }: Props)
       </label>
 
       <label className="block text-sm font-medium">
-        Notes
+        <LocalizedText text="Notes" />
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
@@ -86,11 +89,11 @@ export default function StockMovementForm({ itemId, onSubmit, onCancel }: Props)
       <div className="flex justify-end gap-2">
         {onCancel && (
           <button type="button" onClick={onCancel} className="rounded-lg border px-4 py-2 text-sm">
-            Cancel
+            <LocalizedText text="Cancel" />
           </button>
         )}
         <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white">
-          Save Movement
+          <LocalizedText text="Save Movement" />
         </button>
       </div>
     </form>

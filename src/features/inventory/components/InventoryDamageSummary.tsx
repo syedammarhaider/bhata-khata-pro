@@ -1,6 +1,7 @@
 // ============================================================
 // FILE 298
 // PATH: src/features/inventory/components/InventoryDamageSummary.tsx
+import { LocalizedText } from "../../../lib/i18n";
 // ============================================================
 
 import type { InventoryItem } from "../inventory.types";
@@ -14,7 +15,7 @@ export default function InventoryDamageSummary({
 
   return (
     <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900 dark:bg-rose-950/20">
-      <p className="text-sm text-rose-700 dark:text-rose-300">Total Damaged Bricks</p>
+      <p className="text-sm text-rose-700 dark:text-rose-300"><LocalizedText text="Total Damaged Bricks" /></p>
       <p className="mt-2 text-2xl font-semibold text-rose-800 dark:text-rose-200">
         {damaged.toLocaleString()}
       </p>

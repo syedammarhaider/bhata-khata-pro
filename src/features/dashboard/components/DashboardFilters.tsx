@@ -9,6 +9,8 @@ import type {
   DashboardDateRange,
   DashboardPeriod,
 } from "../dashboard.types";
+import { useAppStore } from "../../../app/store";
+import { translateTextNode } from "../../../lib/i18n";
 
 interface DashboardFiltersProps {
   period: DashboardPeriod;
@@ -25,13 +27,14 @@ export default function DashboardFilters({
   onDateRangeChange,
   onReset,
 }: DashboardFiltersProps) {
+  const language = useAppStore((state) => state.language);
   return (
     <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <Clock size={16} className="text-indigo-600 dark:text-indigo-400" />
           <span className="text-sm font-semibold text-slate-900 dark:text-white">
-            Operational Reporting Period
+            {translateTextNode("Operational Reporting Period", language)}
           </span>
           <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
             {dateRange.startDate} to {dateRange.endDate}
@@ -45,7 +48,7 @@ export default function DashboardFilters({
             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
           >
             <RotateCcw size={13} />
-            Reset to 1 Month
+            {translateTextNode("Reset to 1 Month", language)}
           </button>
         )}
       </div>
@@ -68,7 +71,7 @@ export default function DashboardFilters({
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
             >
-              {item.label}
+              {translateTextNode(item.label, language)}
             </button>
           );
         })}
@@ -79,7 +82,7 @@ export default function DashboardFilters({
         <div className="mt-3 flex flex-wrap items-end gap-3 rounded-xl border border-indigo-100 bg-indigo-50/50 p-3 dark:border-slate-800 dark:bg-slate-800/40">
           <div className="min-w-[140px] flex-1">
             <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-              From Date
+              {translateTextNode("From Date", language)}
             </label>
             <input
               type="date"
@@ -96,7 +99,7 @@ export default function DashboardFilters({
 
           <div className="min-w-[140px] flex-1">
             <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-              To Date
+              {translateTextNode("To Date", language)}
             </label>
             <input
               type="date"
@@ -114,7 +117,7 @@ export default function DashboardFilters({
 
           <div className="flex items-center gap-1 text-xs text-indigo-700 dark:text-indigo-400 pb-2">
             <CalendarDays size={14} />
-            Custom Date Filter Active
+            {translateTextNode("Custom Date Filter Active", language)}
           </div>
         </div>
       )}

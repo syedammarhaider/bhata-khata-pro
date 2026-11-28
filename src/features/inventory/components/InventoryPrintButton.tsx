@@ -3,6 +3,8 @@
 // PATH: src/features/inventory/components/InventoryPrintButton.tsx
 // ============================================================
 
+import { LocalizedText } from "../../../lib/i18n";
+
 export default function InventoryPrintButton() {
   return (
     <button
@@ -10,7 +12,7 @@ export default function InventoryPrintButton() {
       onClick={() => window.print()}
       className="rounded-lg border px-3 py-2 text-sm dark:border-slate-700"
     >
-      Print Inventory
+      <LocalizedText text="Print Inventory" />
     </button>
   );
 }

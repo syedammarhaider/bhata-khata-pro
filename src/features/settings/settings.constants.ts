@@ -34,7 +34,8 @@ export const LANGUAGE_OPTIONS: {
   label: string;
 }[] = [
   { value: "en", label: "English" },
-  { value: "ur", label: "Urdu (اردو)" },
+  { value: "ur", label: "Urdu" },
+  { value: "both", label: "Both" },
 ];
 
 export const CURRENCY_OPTIONS = [
@@ -101,6 +102,11 @@ export const SETTINGS_NAVIGATION: SettingsNavigationItem[] = [
     id: "general",
     label: "General",
     description: "General application preferences",
+  },
+  {
+    id: "security",
+    label: "Account security",
+    description: "Change the password for your own account",
   },
   {
     id: "support",

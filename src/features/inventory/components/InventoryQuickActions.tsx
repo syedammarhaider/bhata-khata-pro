@@ -1,6 +1,7 @@
 // ============================================================
 // FILE 302
 // PATH: src/features/inventory/components/InventoryQuickActions.tsx
+import { LocalizedText } from "../../../lib/i18n";
 // ============================================================
 
 interface Props {
@@ -30,7 +31,7 @@ export default function InventoryQuickActions({
           disabled={!action.callback}
           className="rounded-lg border px-3 py-2 text-sm disabled:opacity-50 dark:border-slate-700"
         >
-          {action.label}
+          <LocalizedText text={action.label} />
         </button>
       ))}
     </div>

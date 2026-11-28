@@ -5,6 +5,8 @@
 
 import type { StockMovementType } from "../inventory.types";
 import { MOVEMENT_OPTIONS } from "../inventory.constants";
+import { useAppStore } from "../../../app/store";
+import { translateText } from "../../../lib/i18n";
 
 interface Props {
   value: StockMovementType | "all";
@@ -12,15 +14,16 @@ interface Props {
 }
 
 export default function InventoryMovementFilters({ value, onChange }: Props) {
+  const language = useAppStore((state) => state.language);
   return (
     <select
       value={value}
       onChange={(event) => onChange(event.target.value as StockMovementType | "all")}
       className="rounded-lg border p-2 text-sm dark:border-slate-700 dark:bg-slate-900"
     >
-      <option value="all">All Movements</option>
+      <option value="all">{translateText("All Movements", language)}</option>
       {MOVEMENT_OPTIONS.map((option) => (
-        <option key={option.value} value={option.value}>{option.label}</option>
+        <option key={option.value} value={option.value}>{translateText(option.label, language)}</option>
       ))}
     </select>
   );

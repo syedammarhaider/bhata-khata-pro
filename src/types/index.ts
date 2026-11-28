@@ -13,7 +13,7 @@ export type ISODate = string;
 export type ISODateTime = string;
 
 export type CurrencyCode = "PKR" | "USD" | "SAR" | "AED";
-export type LanguageCode = "en" | "ur";
+export type LanguageCode = "en" | "ur" | "both";
 
 export type RecordStatus =
   | "active"

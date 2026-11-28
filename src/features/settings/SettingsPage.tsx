@@ -18,6 +18,7 @@ import {
   Flame,
   Users,
   BrickWall,
+  KeyRound,
 } from "lucide-react";
 
 import PageHeader from "../../components/common/PageHeader";
@@ -33,6 +34,7 @@ import DriversSettings from "./components/DriversSettings";
 import FuelTypesSettings from "./components/FuelTypesSettings";
 import LabourPolicySettings from "./components/LabourPolicySettings";
 import SupportUpdatesSettings from "./components/SupportUpdatesSettings";
+import PasswordSettings from "./components/PasswordSettings";
 
 import type {
   GeneralSettings as GeneralSettingsType,
@@ -71,6 +73,20 @@ export default function SettingsPage() {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  async function handleLanguageChange(nextLanguage: typeof language) {
+    setMessage("");
+    setError("");
+
+    try {
+      await invoke("save_app_settings", {
+        settings: [{ setting_key: "language", setting_value: nextLanguage }],
+      });
+      setLanguage(nextLanguage);
+    } catch (err) {
+      setError(`Unable to save language preference: ${String(err)}`);
+    }
+  }
 
   useEffect(() => {
     async function loadSettings() {
@@ -186,12 +202,12 @@ export default function SettingsPage() {
         return (
           <SettingsSection
             title="Language & Urdu Nastaleeq"
-            description="Choose between Urdu (Jameel Noori Nastaleeq) and English."
+            description="Choose English, Urdu, or both. Urdu uses Jameel Noori Nastaleeq."
             icon={<Languages size={19} />}
           >
             <LanguageSettings
               language={language}
-              onChange={setLanguage}
+              onChange={handleLanguageChange}
             />
           </SettingsSection>
         );
@@ -234,6 +250,17 @@ export default function SettingsPage() {
             icon={<Settings size={19} />}
           >
             <SupportUpdatesSettings />
+          </SettingsSection>
+        );
+
+      case "security":
+        return (
+          <SettingsSection
+            title="Account security"
+            description="Change the password for your signed-in account."
+            icon={<KeyRound size={19} />}
+          >
+            <PasswordSettings />
           </SettingsSection>
         );
 

@@ -38,6 +38,7 @@ import {
 
 import { getNavigationForRole } from "../../app/navigation";
 import { useAppStore } from "../../app/store";
+import { translateText, translateTextNode } from "../../lib/i18n";
 
 import type { NavigationSection } from "../../app/navigation";
 
@@ -76,7 +77,7 @@ function NavigationIcon({
 
   const Icon = icons[name] ?? LayoutDashboard;
 
-  return <Icon size={19} strokeWidth={1.8} className="text-slate-700 dark:text-slate-200" />;
+  return <Icon size={18} strokeWidth={1.8} className="text-slate-700 dark:text-slate-200" />;
 }
 
 function NavigationGroup({
@@ -89,16 +90,17 @@ function NavigationGroup({
   closeMobile: () => void;
 }) {
   const [expanded, setExpanded] = useState(true);
+  const language = useAppStore((state) => state.language);
 
   return (
-    <div className="mb-5">
+    <div className="mb-3">
       {!collapsed && (
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
-          className="mb-2 flex w-full items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-600 dark:text-slate-300"
+          className="mb-1 flex w-full items-center justify-between px-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-600 dark:text-slate-300"
         >
-          {section.label}
+          {translateTextNode(section.label, language)}
 
           <ChevronDown
             size={14}
@@ -110,20 +112,20 @@ function NavigationGroup({
       )}
 
       {(expanded || collapsed) && (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {section.items.map((item) => (
             <NavLink
               key={item.id}
               to={item.route}
               end
               onClick={closeMobile}
-              title={collapsed ? item.label : undefined}
+              title={collapsed ? translateText(item.label, language) : undefined}
               className={({ isActive }) =>
                 [
-                  "group flex items-center gap-2 rounded-xl px-2 py-2 text-sm transition-colors",
+                  "group flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] transition-colors",
                   collapsed ? "justify-center" : "",
                   isActive
-                    ? "bg-blue-600 font-medium text-white shadow-sm shadow-blue-900/20"
+                    ? "bg-kiln-clay font-medium text-white shadow-sm shadow-orange-900/20"
                     : "text-slate-600 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800",
                 ].join(" ")
               }
@@ -131,7 +133,7 @@ function NavigationGroup({
               <NavigationIcon name={item.icon} />
 
               {!collapsed && (
-                <span className="truncate">{item.label}</span>
+                <span className="truncate">{translateTextNode(item.label, language)}</span>
               )}
             </NavLink>
           ))}
@@ -155,6 +157,7 @@ export default function Sidebar() {
   );
 
   const [mobileOpen, setMobileOpen] = useState(false);
+  const language = useAppStore((state) => state.language);
 
   if (!currentUser) return null;
 
@@ -164,9 +167,9 @@ export default function Sidebar() {
 
   const sidebarContent = (
     <>
-      <div className="flex h-[76px] items-center justify-between border-b border-slate-200 dark:border-slate-800 px-4">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
+      <div className="flex h-[64px] shrink-0 items-center justify-between border-b border-slate-200 px-3 dark:border-slate-800">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-kiln-clay text-white">
             <Factory size={22} />
           </div>
 
@@ -205,7 +208,7 @@ export default function Sidebar() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-5">
+      <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-3">
         {sections.map((section) => (
           <NavigationGroup
             key={section.id}
@@ -214,9 +217,9 @@ export default function Sidebar() {
             closeMobile={closeMobile}
           />
         ))}
-      </div>
+      </nav>
 
-      <div className="border-t border-slate-200 dark:border-slate-800 p-4">
+      <div className="shrink-0 border-t border-slate-200 p-3 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
             {currentUser.full_name
@@ -247,22 +250,22 @@ export default function Sidebar() {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-40 rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-white lg:hidden"
+        className={`fixed ${language === "ur" ? "right-4 left-auto" : "left-4 right-auto"} top-4 z-40 rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-white lg:hidden`}
         aria-label="Open navigation"
       >
         <Menu size={20} />
       </button>
 
       <aside
-        className={`hidden shrink-0 flex-col bg-white border-r border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-[width] duration-200 lg:flex ${
-          collapsed ? "w-[76px]" : "w-[260px]"
+        className={`fixed inset-y-0 z-40 hidden shrink-0 flex-col border-r border-slate-200 bg-white transition-[width] duration-200 dark:border-slate-800 dark:bg-slate-950 lg:flex ${language === "ur" ? "right-0 left-auto" : "left-0 right-auto"} ${
+          collapsed ? "w-[68px]" : "w-[224px]"
         }`}
       >
         {sidebarContent}
       </aside>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className={`fixed inset-0 z-50 flex lg:hidden ${language === "ur" ? "justify-end" : "justify-start"}`}>
           <button
             type="button"
             className="absolute inset-0 bg-black/60"
@@ -270,7 +273,7 @@ export default function Sidebar() {
             aria-label="Close navigation overlay"
           />
 
-          <aside className="relative flex h-full w-[280px] flex-col bg-white dark:bg-slate-950 shadow-2xl">
+          <aside className="relative flex h-full w-[260px] flex-col bg-white shadow-2xl dark:bg-slate-950">
             {sidebarContent}
           </aside>
         </div>

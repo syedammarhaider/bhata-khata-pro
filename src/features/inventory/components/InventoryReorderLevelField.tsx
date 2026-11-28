@@ -1,6 +1,7 @@
 // ============================================================
 // FILE 310
 // PATH: src/features/inventory/components/InventoryReorderLevelField.tsx
+import { LocalizedText } from "../../../lib/i18n";
 // ============================================================
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
 export default function InventoryReorderLevelField({ value, onChange }: Props) {
   return (
     <label className="block text-sm font-medium">
-      Reorder Level
+      <LocalizedText text="Reorder Level" />
       <input
         type="number"
         min="0"

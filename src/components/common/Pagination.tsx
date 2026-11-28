@@ -5,6 +5,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { useAppStore } from "../../app/store";
+import { translateText } from "../../lib/i18n";
 
 interface PaginationProps {
   page?: number;
@@ -29,6 +31,7 @@ export default function Pagination({
   pageSizeOptions = [10, 25, 50, 100],
   className = "",
 }: PaginationProps) {
+  const language = useAppStore((state) => state.language);
   const safePageSize = Math.max(1, pageSize ?? 1);
   const totalPages =
     totalPagesProp ?? Math.max(1, Math.ceil((totalItems ?? 0) / safePageSize));
@@ -60,7 +63,7 @@ export default function Pagination({
 
         {onPageSizeChange && (
           <label className="flex items-center gap-2">
-            Rows:
+            {translateText("Rows", language)}:
             <select
               value={safePageSize}
               onChange={(event) => {
@@ -85,7 +88,7 @@ export default function Pagination({
           className={buttonClass}
           onClick={() => onPageChange(1)}
           disabled={currentPage <= 1}
-          aria-label="First page"
+          aria-label={translateText("First page", language)}
         >
           <ChevronsLeft size={15} />
         </button>
@@ -95,7 +98,7 @@ export default function Pagination({
           className={buttonClass}
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          aria-label="Previous page"
+          aria-label={translateText("Previous page", language)}
         >
           <ChevronLeft size={15} />
         </button>
@@ -109,7 +112,7 @@ export default function Pagination({
           className={buttonClass}
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          aria-label="Next page"
+          aria-label={translateText("Next page", language)}
         >
           <ChevronRight size={15} />
         </button>
@@ -119,7 +122,7 @@ export default function Pagination({
           className={buttonClass}
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage >= totalPages}
-          aria-label="Last page"
+          aria-label={translateText("Last page", language)}
         >
           <ChevronsRight size={15} />
         </button>
